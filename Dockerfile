@@ -89,9 +89,7 @@ ENV CONFIG_FILE ''
 # couple available volumes you may want to use
 VOLUME ["/home/ftpusers", "/etc/pure-ftpd/passwd"]
 
-ENTRYPOINT [ "/bin/bash" ]
-
 # startup
-CMD ["/run.sh", "-l", "puredb:/etc/pure-ftpd/pureftpd.pdb", "-E", "-j", "-R", "-P", "$PUBLICHOST"]
+CMD ["/bin/bash", "/run.sh", "-l", "puredb:/etc/pure-ftpd/pureftpd.pdb", "-E", "-j", "-R", "-P", "$PUBLICHOST"]
 
 EXPOSE 21 30000-30009
