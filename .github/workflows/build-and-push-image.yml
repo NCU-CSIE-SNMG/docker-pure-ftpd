@@ -20,12 +20,6 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - name: Set variables
-        shell: python3
-        run: |
-          import os
-          os.environ['GITHUB_ENV_']
-          os.environ['IMAGE_TAG'] = os.environ['GITHUB_SHA'][:7]
       - name: Build frontend and push
         uses: docker/build-push-action@v4
         with:
