@@ -4,20 +4,18 @@ FROM debian:buster as builder
 # properly setup debian sources
 ENV DEBIAN_FRONTEND noninteractive
 RUN echo "deb http://http.debian.net/debian buster main\n\
-deb-src http://http.debian.net/debian buster main\n\
-deb http://http.debian.net/debian buster-updates main\n\
-deb-src http://http.debian.net/debian buster-updates main\n\
-deb http://security.debian.org buster/updates main\n\
-deb-src http://security.debian.org buster/updates main\n\
-" > /etc/apt/sources.list
+	deb-src http://http.debian.net/debian buster main\n\
+	deb http://http.debian.net/debian buster-updates main\n\
+	deb-src http://http.debian.net/debian buster-updates main\n\
+	deb http://security.debian.org buster/updates main\n\
+	deb-src http://security.debian.org buster/updates main\n\
+	" > /etc/apt/sources.list
 
 # install package building helpers
 # rsyslog for logging (ref https://github.com/stilliard/docker-pure-ftpd/issues/17)
 RUN apt-get -y update && \
 	apt-get -y --force-yes --fix-missing install dpkg-dev debhelper &&\
 	apt-get -y build-dep pure-ftpd
-	
-
 # Build from source - we need to remove the need for CAP_SYS_NICE and CAP_DAC_READ_SEARCH
 RUN mkdir /tmp/pure-ftpd/ && \
 	cd /tmp/pure-ftpd/ && \
@@ -32,7 +30,7 @@ RUN mkdir /tmp/pure-ftpd/ && \
 FROM debian:buster-slim
 
 # feel free to change this ;)
-LABEL maintainer "Andrew Stilliard <andrew.stilliard@gmail.com>"
+LABEL maintainer "ppodds <oscar20020629@gmail.com>"
 
 # install dependencies
 # FIXME : libcap2 is not a dependency anymore. .deb could be fixed to avoid asking this dependency
@@ -41,22 +39,22 @@ RUN apt-get -y update && \
 	apt-get  --no-install-recommends --yes install \
 	libc6 \
 	libcap2 \
-    libmariadb3 \
+	libmariadb3 \
 	libpam0g \
 	libssl1.1 \
-    lsb-base \
-    openbsd-inetd \
-    openssl \
-    perl \
+	lsb-base \
+	openbsd-inetd \
+	openssl \
+	perl \
 	rsyslog
 
 COPY --from=builder /tmp/pure-ftpd/*.deb /tmp/pure-ftpd/
 
 # install the new deb files
 RUN dpkg -i /tmp/pure-ftpd/pure-ftpd-common*.deb &&\
-	dpkg -i /tmp/pure-ftpd/pure-ftpd_*.deb && \
+	# dpkg -i /tmp/pure-ftpd/pure-ftpd_*.deb && \
 	# dpkg -i /tmp/pure-ftpd/pure-ftpd-ldap_*.deb && \
-	# dpkg -i /tmp/pure-ftpd/pure-ftpd-mysql_*.deb && \
+	dpkg -i /tmp/pure-ftpd/pure-ftpd-mysql_*.deb && \
 	# dpkg -i /tmp/pure-ftpd/pure-ftpd-postgresql_*.deb && \
 	rm -Rf /tmp/pure-ftpd 
 
@@ -85,6 +83,7 @@ RUN apt-get -y clean \
 
 # default publichost, you'll need to set this for passive support
 ENV PUBLICHOST localhost
+ENV CONFIG_FILE ''
 
 # couple available volumes you may want to use
 VOLUME ["/home/ftpusers", "/etc/pure-ftpd/passwd"]

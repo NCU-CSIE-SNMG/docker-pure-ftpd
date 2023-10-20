@@ -145,7 +145,13 @@ fi
 
 # let users know what flags we've ended with (useful for debug)
 echo "Starting Pure-FTPd:"
-echo "  pure-ftpd $PURE_FTPD_FLAGS"
-
-# start pureftpd with requested flags
-exec /usr/sbin/pure-ftpd $PURE_FTPD_FLAGS
+if [ -z "$CONFIG_FILE" ]
+then
+    echo "  pure-ftpd-mysql $PURE_FTPD_FLAGS"
+    # start pureftpd with requested flags
+    exec /usr/sbin/pure-ftpd $PURE_FTPD_FLAGS
+else
+    echo "  pure-ftpd-mysql $CONFIG_FILE"
+    # start pureftpd with config file
+    exec /usr/sbin/pure-ftpd-mysql "$CONFIG_FILE"
+fi
