@@ -24,4 +24,4 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           push: true
-          tags: ${{ env.IMAGE_NAMESPACE }}/${{ env.IMAGE_NAME }}:latest,${{ env.IMAGE_NAMESPACE }}/${{ env.IMAGE_NAME }}:buster
+          tags: ${{ env.IMAGE_NAMESPACE }}/${{ env.IMAGE_NAME }}:latest,${{ env.IMAGE_NAMESPACE }}/${{ env.IMAGE_NAME }}:bookworm

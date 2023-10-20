@@ -1,14 +1,14 @@
 #Stage 1 : builder debian image
-FROM debian:buster as builder
+FROM debian:bookworm as builder
 
 # properly setup debian sources
 ENV DEBIAN_FRONTEND noninteractive
-RUN echo "deb http://http.debian.net/debian buster main\n\
-	deb-src http://http.debian.net/debian buster main\n\
-	deb http://http.debian.net/debian buster-updates main\n\
-	deb-src http://http.debian.net/debian buster-updates main\n\
-	deb http://security.debian.org buster/updates main\n\
-	deb-src http://security.debian.org buster/updates main\n\
+RUN echo "deb http://deb.debian.org/debian bookworm main\n\
+	deb-src http://deb.debian.org/debian bookworm main\n\
+	deb http://deb.debian.org/debian bookworm-updates main\n\
+	deb-src http://deb.debian.org/debian bookworm-updates main\n\
+	deb http://deb.debian.org/debian-security/ bookworm-security main\n\
+	deb-src http://deb.debian.org/debian-security/ bookworm-security main\n\
 	" > /etc/apt/sources.list
 
 # install package building helpers
@@ -27,7 +27,7 @@ RUN mkdir /tmp/pure-ftpd/ && \
 
 
 #Stage 2 : actual pure-ftpd image
-FROM debian:buster-slim
+FROM debian:bookworm-slim
 
 # feel free to change this ;)
 LABEL maintainer "ppodds <oscar20020629@gmail.com>"
@@ -39,13 +39,14 @@ RUN apt-get -y update && \
 	apt-get  --no-install-recommends --yes install \
 	libc6 \
 	libcap2 \
+	libcrypt1 \
 	libmariadb3 \
 	libpam0g \
-	libssl1.1 \
+	libsodium23 \
+	libssl3 \
 	lsb-base \
 	openbsd-inetd \
 	openssl \
-	perl \
 	rsyslog
 
 COPY --from=builder /tmp/pure-ftpd/*.deb /tmp/pure-ftpd/
@@ -88,7 +89,9 @@ ENV CONFIG_FILE ''
 # couple available volumes you may want to use
 VOLUME ["/home/ftpusers", "/etc/pure-ftpd/passwd"]
 
+ENTRYPOINT [ "/bin/bash" ]
+
 # startup
-CMD /run.sh -l puredb:/etc/pure-ftpd/pureftpd.pdb -E -j -R -P $PUBLICHOST
+CMD ["/run.sh", "-l", "puredb:/etc/pure-ftpd/pureftpd.pdb", "-E", "-j", "-R", "-P", "$PUBLICHOST"]
 
 EXPOSE 21 30000-30009
